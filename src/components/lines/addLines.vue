@@ -1,7 +1,7 @@
 <template>
    <q-card class="formulario">
         <q-card-section class="row">
-          <div class="text-h6">Agregar Categoria</div>
+          <div class="text-h6">Agregar Linea</div>
           <q-space />
           <q-btn
             v-close-popup
@@ -75,7 +75,7 @@ export default {
       }, 
     
         methods: {
-            ...mapActions('categories/categories', ['addCategory']),
+            ...mapActions('lines/lines', ['addLine']),
 
             submitForm() {
                 console.log('submitFom')
@@ -84,24 +84,24 @@ export default {
                  if(!this.$refs.name.hasError && !this.$refs.description.hasErrors){
                     var user = auth.currentUser;
                     this.lineToSubmit.author = user.uid;
-                    this.submitCategory();
+                    this.submitLine();
                 }
             }, 
 
-          async submitCategory(){
+          async submitLine(){
               try {
-                   const query = await db.collection('categories').add(
+                   const query = await db.collection('lines').add(
                      this.lineToSubmit
                  )
                  .then( (res) => {
                    this.lineToSubmit.id = res.id;
-                   this.addCategory(this.lineToSubmit)
+                   this.addLine(this.lineToSubmit)
                    console.log(res.id)
                    this.$emit('close');
                   })
                   .then( res => {
                   this.$q.notify({
-                   message: 'Category saved successfully!',
+                   message: 'lines saved successfully!',
                    type: 'positive',
                    position: 'top-right',
                  })

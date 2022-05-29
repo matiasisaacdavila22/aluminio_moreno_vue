@@ -93,10 +93,13 @@
                   <q-btn size="10px" class="glossy" round color="deep-orange" icon="layers_clear" @click="activeProduct(props.row.id)"/>
               </div>
            </q-td>
-          <q-td key="actions"><button style="margin:3px" @click="editProduct(props.row.id)">update</button>
-                              <button style="margin:3px" @click="editProduct(props.row.id)">Edit</button>  
-                              <q-btn size="12px" round color="red-5" icon="delete"  @click="confirm(props.row.id)" />
-                             
+         <q-td key="actions" class="row">
+            <div class="col">
+              <q-btn class="col" size="12px" round color="green-5" icon="cached" @click="editProduct(props.row.id)" /> 
+            </div>
+             <div class="col">
+              <q-btn size="12px" round color="red-5" icon="delete"  @click="confirm(props.row.id)" />
+            </div>              
           </q-td>
         </q-tr>
          </template>
@@ -117,6 +120,38 @@ import addCategories from 'components/categories/addCategories.vue';
 import { ref } from "vue";
 import { auth } from "boot/firebase";
 import Card from "components/dashboard/Card.vue";
+
+const linksList = [
+          {
+            title: 'Productos',
+            totalEvents: 0,
+            icon: 'date_range',
+            active: false,
+           // to: '#/events'
+          },
+          {
+            title: 'Puertas',
+            totalEvents: 0,
+            caption: '',
+            icon: 'contact_mail',
+             active: false,
+          },
+          {
+            title: 'Ventas',
+            totalEvents: 0,
+            caption: '',
+            icon: 'checklist_rtl',
+             active: false,
+          },
+           {
+            title: 'Compras',
+            totalEvents: 0,
+            caption: '',
+            icon: 'question_answer',
+             active: false,
+           }
+        ];
+
 
 export default defineComponent({
   name: "AdminProducts",
@@ -211,9 +246,9 @@ export default defineComponent({
 
     showform() {
       switch (this.select) {
-        case "Ventanas":
+        case "Productos":
           console.log("es Productos");
-        if (this.getProducts.length <= 0) {
+        if (this.getCategories.length <= 0) {
             this.$q.notify({
               message: "No tienes Categorias Disponibles!!",
               type: "warning",

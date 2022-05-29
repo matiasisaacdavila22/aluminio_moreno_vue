@@ -1,5 +1,5 @@
 <template>
-   <q-card class="addProduct-container" >
+   <q-card class="row" style="max-width:600px">
        <q-card-section class="row">
           <div class="text-h6">Agregar Producto</div>
           <q-space />
@@ -13,86 +13,46 @@
         </q-card-section>
     
        <form @submit.prevent="submitForm" >
-           <div> 
-            <q-card-section class="container2">
+             <q-card-section class="container2">
          
-              <div class="addProduct-container3">
-                <div class="addProduct-item">
-                      <q-input outlined v-model="productToSubmit.name" label="Name" :rules="[val => !!val || 'Field is required']" ref="name"/>
-                </div>
-                <div class="addProduct-item">
-                    <q-input outlined v-model="productToSubmit.model" label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
-                </div>
-                <div class="addProduct-item">   
-                  <q-select outlined v-model="productToSubmit.category" :options="getNameCategories" label="Categories" :rules="[val => !!val || 'Field is required']" ref="category"/>
-                  </div>
-                <div class="addProduct-item">    
-                  <q-input outlined v-model="productToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
-                </div>
-                <div class="addProduct-item">    
-                  <q-input outlined v-model="productToSubmit.cost" label="Cost" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
-                </div>
-                <div class="addProduct-item">  
-                  <q-input outlined v-model="productToSubmit.price" label="Price" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
-                </div>
-                <div class="addProduct-item">  
-                  <q-input outlined v-model="productToSubmit.stock" label="Stock" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="stock"/>
-                </div>
-                <div class="addProduct-item">   
-                  <q-input outlined v-model="productToSubmit.stars" label="Stars" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 6) || 'Please type a number less than zero']" ref="stars"/>
-                </div>
-                <div class="addProduct-item">   
-                  <q-input outlined v-model="productToSubmit.active" label="Active" />
-                </div>  
-           </div>
-           <div class="addProduct-item1">
-                       
-              <q-uploader
-                style="max-width: 250px; max-height: 100px"
-                auto-upload
-                hide-upload-btn = "false"
-                label="Select to images MAX: 3"
-                multiple 
-                auto-expand
-                max-files="3"
-                accept=".jpg, image/*"
-                @rejected="onRejected"
-                @removed ="remove"
-                :factory="factoryFn"
-              >
-              <template v-slot:header="scope">
-                <div class="row no-wrap items-center q-pa-sm q-gutter-xs" >
-                  <q-btn v-if="scope.queuedFiles.length > 0" icon="clear_all" @click="scope.removeQueuedFiles" round dense flat >
-                    <q-tooltip>Clear All</q-tooltip>
-                  </q-btn>
-                  <q-btn v-if="scope.uploadedFiles.length > 0" icon="delete" @click="scope.removeUploadedFiles" round dense flat >
-                    <q-tooltip>Remove Uploaded Files</q-tooltip>
-                  </q-btn>
-                  <q-spinner v-if="scope.isUploading" class="q-uploader__spinner" />
-                  <div class="col">
-                    <div class="q-uploader__title">Upload your files</div>
-                    <div class="q-uploader__subtitle">{{ scope.uploadSizeLabel }} / {{ scope.uploadProgressLabel }}</div>
-                  </div>
-                  <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" @click="scope.pickFiles" round dense flat>
-                    <q-uploader-add-trigger />
-                    <q-tooltip>Pick Files</q-tooltip>
-                  </q-btn>
-                  <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="scope.upload" round dense flat >
-                    <q-tooltip>Upload Files</q-tooltip>
-                  </q-btn>
-
-                  <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
-                    <q-tooltip>Abort Upload</q-tooltip>
-                  </q-btn>
-                </div>
-               </template>
-             </q-uploader>
-             </div>
-         
+              <div class="row" style="max-width:500px">
+                    <div class="col-6">   
+                      <q-select outlined v-model="productToSubmit.category" :options="getNameCategories" label="Categories" :rules="[val => !!val || 'Field is required']" ref="category"/>
+                    </div>
+                    <div class="col-6">   
+                      <q-select outlined v-model="productToSubmit.line" :options="getNameLines" label="Linea" :rules="[val => !!val || 'Field is required']" ref="linea"/>
+                    </div>
+                    <div class="col-6">
+                        <q-input outlined v-model="productToSubmit.model" label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
+                    </div>
+                    <div class="col-6">
+                          <q-input outlined v-model="productToSubmit.name" label="Medida-cm (alto*ancho)" :rules="[val => !!val || 'Field is required']" ref="measure"/>
+                    </div>
+                    <div class="col-6">    
+                      <q-input outlined v-model="productToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
+                    </div>
+                    <div class="col-6">    
+                      <q-input outlined v-model="productToSubmit.cost" label="Cost" disable  :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                    </div>
+                    <div class="col-6">  
+                      <q-input outlined v-model="productToSubmit.price" label="Price" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
+                    </div>
+                    <div class="col-6">  
+                      <q-input outlined v-model="productToSubmit.stock" label="Stock" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="stock"/>
+                    </div>
+                    <div class="col-6">  
+                      <q-toggle
+                        label="Active"
+                        v-model="productToSubmit.active"
+                        checked-icon="check"
+                        color="green"
+                        unchecked-icon="clear"
+                      />
+                    </div>
+           </div>       
            
         </q-card-section>
 
-     </div>  
         <div>
             <q-card-actions align="center" class="btnSave">
               <q-btn  label="SAVE" color="primary" type="submit"  class="btn-save"/>
@@ -139,7 +99,7 @@ export default {
                 categoriesAux: [],
 
                 productToSubmit: {               
-                     name: '',
+                     line: '',
                      model:'',
                      category: '',
                      description: '',
@@ -161,7 +121,8 @@ export default {
 
         computed: {
               ...mapState('categories/categories',['categories']),
-              ...mapGetters('categories/categories', ['getCategories', 'getNameCategories'])
+              ...mapGetters('categories/categories', ['getCategories', 'getNameCategories']),
+              ...mapGetters('lines/lines', ['getLines', 'getNameLines']),
 
             },
 
@@ -192,23 +153,19 @@ export default {
 
 
             submitForm() {
-                this.$refs.name.validate()
-                this.$refs.model.validate()
-                this.$refs.category.validate()
-                this.$refs.description.validate()
-                this.$refs.cost.validate()
+               // this.$refs.description.validate()
+              //  this.$refs.cost.validate()
                 this.$refs.price.validate()
                 this.$refs.stock.validate()
-                this.$refs.stars.validate()
-                if(!this.$refs.name.hasError 
-                  && !this.$refs.category.hasError 
-                  && !this.$refs.model.hasError 
-                  && !this.$refs.description.hasError 
-                  && !this.$refs.cost.hasError 
-                  && !this.$refs.price.hasError 
-                  && !this.$refs.stock.hasError 
-                  && !this.$refs.stars.hasError){
-                  this.upImages();  
+                if(!this.$refs.price.hasError 
+                //  && !this.$refs.category.hasError 
+                //  && !this.$refs.model.hasError 
+                //  && !this.$refs.description.hasError 
+                //  && !this.$refs.cost.hasError 
+                //  && !this.$refs.price.hasError 
+                  && !this.$refs.stock.hasError ){
+             //     this.upImages();  
+               this.submitProduct();  // se agrego por que no hay imagenes que agregar
                  }
             },
             

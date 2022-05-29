@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import products from './products';
 import categories from './categories';
 import dashboard from './dashboard';
+import lines from './lines';
 
 // import example from './module-example'
 
@@ -21,6 +22,7 @@ export default store(function (/* { ssrContext } */) {
       products,
       categories,
       dashboard,
+      lines,
     },
 
     // enable strict mode (adds overhead!)
