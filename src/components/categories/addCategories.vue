@@ -14,17 +14,24 @@
 
     <form @submit.prevent="submitForm" >
          <q-card-section class="q-pt-none">
-           <div class="container">
-             <div class="item">
+           <div class="column full-width">
+             <div>
                   <q-input outlined v-model="categoryToSubmit.name" label="Name" :rules="[val => !!val || 'Field is required']" ref="name"/>
              </div>
-            <div class="item">    
-              <q-input outlined v-model="categoryToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
+            <div>    
+              <q-input type="textarea" outlined v-model="categoryToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
             </div>
-            <div class="item">   
-              <q-input outlined v-model="categoryToSubmit.active" label="Active" />
-            </div>  
+            <div>
+              <q-toggle
+                label="Active"
+                v-model="categoryToSubmit.active"
+                checked-icon="check"
+                color="green"
+                unchecked-icon="clear"
+              />
+            </div>
           </div>   
+
         </q-card-section>
 
         <q-card-actions align="right">
@@ -40,7 +47,7 @@
 import {db} from "boot/firebase";
 import { mapActions } from 'vuex'
 import { auth } from 'boot/firebase'
-
+import { ref } from 'vue';
 
 export default {
        data() {
@@ -55,6 +62,11 @@ export default {
             }
         },
 
+      setup () {
+        return {
+
+        }
+      },
        
       created(){
         var user = auth.currentUser;

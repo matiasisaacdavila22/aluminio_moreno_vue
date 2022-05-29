@@ -8,7 +8,7 @@
 
     <div class="index_contenedor">
       <Card
-        v-for="card in getCardList"
+        v-for="card in essentialLinks"
         :class="card.title == select ? 'card_active' : 'card_my-card'"
         :key="card.title"
         v-bind="card"
@@ -52,6 +52,24 @@ import addCategories from 'components/categories/addCategories.vue';
 import { ref } from "vue";
 import { auth } from "boot/firebase";
 import Card from "components/dashboard/Card.vue";
+
+const linksList = [
+          {
+            title: 'Costos',
+            totalEvents: 0,
+            icon: 'date_range',
+            active: false,
+           // to: '#/events'
+          },
+          {
+            title: 'Ganancia %',
+            totalEvents: 0,
+            caption: '',
+            icon: 'contact_mail',
+             active: false,
+          },
+
+];
 
 export default defineComponent({
   name: "Dashboard",
@@ -100,6 +118,7 @@ export default defineComponent({
     }
 
     return {
+      essentialLinks: linksList,
       confirm,
       prompt,
       select: ref('Productos'),

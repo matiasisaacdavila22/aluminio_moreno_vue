@@ -4,7 +4,7 @@ export default {
     namespaced: true,
 
       state: {
-            products: ['casa','perro', 'melon'],
+            products: [],
       
 
             columns : [

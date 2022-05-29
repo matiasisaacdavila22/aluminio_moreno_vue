@@ -99,12 +99,17 @@ const linksList = [
     to: '/admin/categories'
   },
   {
+    name: 'Lineas',
+    description: 'administracion y Configuracion Lineas',
+    icon: 'config',
+    to: '/admin/line'
+  },
+  {
     name: 'Config',
     description: 'administracion y Configuracion',
     icon: 'config',
     to: '/admin/config'
   },
-
 ];
 
 

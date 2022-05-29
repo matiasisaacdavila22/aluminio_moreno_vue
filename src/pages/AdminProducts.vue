@@ -28,14 +28,79 @@
       <q-dialog v-model="showAddProduct">
         <add-products @close="showAddProduct = false" />
       </q-dialog>
-      <q-table
-        title="Table Products"
-        :rows="getProducts"
-        :columns="columns"
-        row-key="name"
-        binary-state-sort
-      >
- 
+     <q-table
+      title="Table Products"
+      :rows="getProducts"
+      :columns="columns"
+      row-key="name"
+      binary-state-sort
+    >
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="name" :props="props">
+            {{ props.row.name }}
+            <q-popup-edit v-model="props.row.name" title="Update Name" buttons persistent  v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus counter hint="Use buttons to close"/>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="model" :props="props">
+            {{ props.row.model }}
+            <q-popup-edit v-model="props.row.model" title="Update Model" buttons persistent  v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus counter hint="Use buttons to close"/>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="category" :props="props">
+            {{ props.row.category }}
+            <q-popup-edit v-model="props.row.category" title="Update category" buttons v-slot="scope">
+              <q-select outlined v-model="scope.value"  :options="getNameCategories" label="Outlined" />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="description" :props="props">
+            <div class="text-pre-wrap">{{ props.row.description.slice(0,10)}}</div>
+            <q-popup-edit v-model="props.row.description" title="Update Description" buttons persistent  v-slot="scope">
+              <q-input type="textarea" v-model="scope.value" dense autofocus hint="Use buttons to close"/>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="cost" :props="props">
+            {{ props.row.cost }}
+            <q-popup-edit v-model="props.row.cost" title="Update Cost" buttons persistent v-slot="scope">
+              <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="price" :props="props">
+            {{ props.row.price }}
+              <q-popup-edit v-model="props.row.price" title="Update Price" buttons persistent v-slot="scope">
+                <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+            </q-popup-edit>
+            </q-td>
+          <q-td key="stock" :props="props">
+            {{ props.row.stock }}
+            <q-popup-edit v-model="props.row.stock" title="Update Stock" buttons persistent v-slot="scope">
+              <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+            </q-popup-edit>
+            </q-td>
+          <q-td key="stars" :props="props">
+            {{ props.row.stars }}
+            <q-popup-edit v-model="props.row.stars" title="Update Stars" buttons persistent v-slot="scope">
+              <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+            </q-popup-edit>
+            </q-td>
+          <q-td key="active" :props="props">
+              <div v-if="props.row.active">
+                    <q-btn size="10px" class="glossy" round color="secondary" icon="local_florist" @click="activeProduct(props.row.id)"/>
+                </div>
+                <div v-if="!props.row.active">
+                  <q-btn size="10px" class="glossy" round color="deep-orange" icon="layers_clear" @click="activeProduct(props.row.id)"/>
+              </div>
+           </q-td>
+          <q-td key="actions"><button style="margin:3px" @click="editProduct(props.row.id)">update</button>
+                              <button style="margin:3px" @click="editProduct(props.row.id)">Edit</button>  
+                              <q-btn size="12px" round color="red-5" icon="delete"  @click="confirm(props.row.id)" />
+                             
+          </q-td>
+        </q-tr>
+         </template>
+
       </q-table>
     </div>
   </div> 
@@ -122,31 +187,31 @@ export default defineComponent({
   },
 
   created() {
-   // this.listProducts();
-   // this.listCategories();
+    this.listProducts();
+    this.listCategories();
   //  this.listSales();
-  //console.log(this.getCategories)
   },
 
 
   computed: {
-   // ...mapState("products/products", ["products", "columns"]),
-   // ...mapState("categories/categories", ["categories",'columnsCategories']),
+    ...mapState("products/products", ["products", "columns"]),
+    ...mapState("categories/categories", ["categories",'columnsCategories']),
+    ...mapGetters("categories/categories", ["getCategories"]),
    // ...mapState('sales/sales', ['sales','columnsSales']),
     ...mapGetters("products/products", ["getProducts"]),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
   //  ...mapGetters('sales/sales', ['getSales'])
   },
-/*
+
   methods: {
     ...mapActions("products/products", ["setProducts", "deleteProduct"]),
     ...mapActions("categories/categories", ["setCategories"]),
-    ...mapActions('sales/sales',["SET_SALES"]),
+    //...mapActions('sales/sales',["SET_SALES"]),
     ...mapActions('dashboard/dashboard', ['SET_PRODUCTS_TOTAL','SET_CATEGORIES_TOTAL','SET_SALES_TOTAL']),
 
     showform() {
       switch (this.select) {
-        case "Productos":
+        case "Ventanas":
           console.log("es Productos");
         if (this.getProducts.length <= 0) {
             this.$q.notify({
@@ -161,11 +226,6 @@ export default defineComponent({
           this.showAddProduct = true;
           break;
           }
-
-        case "Categorias":
-          console.log("es Categorias");
-           this.showAddCategory = true;
-            break;
 
         case "Ventas":
           console.log("es Ventas");
@@ -313,57 +373,6 @@ export default defineComponent({
       }
     },
 
-   async activeCategory(id) {
-      const category = this.categories.find(category => category.id === id);
-      if(category !== null){
-        const washingtonRef = doc(db, "categories", id);
-
-        await updateDoc(washingtonRef, {
-                      active: !category.active,
-        })
-        .then( (resp) => {
-            const categoriesUpdate = this.categories.map(p => {
-              if(p.id === id){
-                p.active = !p.active
-              }
-              return p;
-              });
-           this.categories = categoriesUpdate;            
-        })
-        .catch( (error) => {
-          console.log('erro :', error)
-        });
-
-      }
-    },
- 
-
-   async editCategory(id) {
-      const category = this.categories.find(category => category.id === id);
-      if(category !== null){
-        const washingtonRef = doc(db, "categories", id);
-
-        // Set the "capital" field of the city 'DC'
-        await updateDoc(washingtonRef, {
-                  name: category.name,
-                  description: category.description,
-                  active: category.active,
-        })
-        .then( (reesp) => {
-                  this.$q.notify({
-                   message: 'Task updated successfully',
-                   type: 'positive',
-                   position: 'top-right',
-                   timeout: 1000,
-                   multiLine: false,
-                   })
-        })
-        .catch( (error) => {
-          console.log('erro :', error)
-        });
-
-      }
-    },
 
    async activeSale(id){
       const sale = this.sales.find(sale => sale.id === id);
@@ -390,7 +399,7 @@ export default defineComponent({
     },
 
   },
-*/
+
 
 });
 </script>

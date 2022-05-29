@@ -8,7 +8,7 @@ export default {
 
         cardList: [
           {
-            title: 'Ventanas',
+            title: 'Productos',
             totalEvents: 0,
             icon: 'date_range',
             active: false,

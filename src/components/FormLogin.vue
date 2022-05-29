@@ -104,7 +104,7 @@ export default defineComponent({
           );
           if(userCredential){
              console.log(userCredential.user);
-             this.$router.push({name: 'dashboard'});
+             this.$router.push({name: 'adminProducts'});
  
               this.$q.notify({
                                 message: 'Bienvenido!',

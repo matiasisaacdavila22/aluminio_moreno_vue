@@ -11,9 +11,10 @@ const routes = [
     path: '/admin',
     component: () => import('layouts/MainLayoutAdmin.vue'),
     children: [
-      { path: '', component: () => import('pages/Dashboard.vue'),name: 'dashboard', meta: {auth: true} },
+      { path: '', component: () => import('pages/AdminProducts.vue'),name: 'adminDashboard', meta: {auth: true} },
       { path: 'products', component: () => import('pages/AdminProducts.vue'),name: 'adminProducts', meta: {auth: true} },
       { path: 'categories', component: () => import('pages/AdminCategories.vue'),name: 'adminCategories', meta: {auth: true} },
+      { path: 'line', component: () => import('pages/AdminLine.vue'),name: 'adminLine', meta: {auth: true} },
       { path: 'config', component: () => import('pages/AdminConfig.vue'),name: 'adminConfig', meta: {auth: true} },
     ]
   },

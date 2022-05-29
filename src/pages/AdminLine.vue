@@ -12,7 +12,7 @@
         :class="card.title == select ? 'card_active' : 'card_my-card'"
         :key="card.title"
         v-bind="card"
-        :totalEvents="getCategories.length"
+        :totalEvents="card.totalEvents"
         @click="select = card.title"
       />
     </div>
@@ -24,50 +24,19 @@
       />
     </div>
 
-    <div class="index_contenedor_table" v-if="select == 'Categorias'">
-          <q-dialog v-model="showAddCategory">
-         <add-categories @close='showAddCategory = false'/>
-    </q-dialog>
- <q-table
-      title="Table Categories"
-      :rows="getCategories"
-      :columns="columnsCategories"
-      row-key="name"
-      binary-state-sort
-    >
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td key="name" :props="props">
-            {{ props.row.name }}
-            <q-popup-edit v-model="props.row.name" title="Update Name" buttons persistent  v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus counter hint="Use buttons to close"/>
-            </q-popup-edit>
-          </q-td>
-          <q-td key="description" :props="props">
-            <div class="text-pre-wrap">{{ props.row.description.slice(0,35)}}</div>
-            <q-popup-edit v-model="props.row.description" title="Update Description" buttons persistent  v-slot="scope">
-              <q-input type="textarea" v-model="scope.value" dense autofocus hint="Use buttons to close"/>
-            </q-popup-edit>
-          </q-td>
-           <q-td key="active" :props="props">
-              <div v-if="props.row.active">
-                    <q-btn size="10px" class="glossy" round color="secondary" icon="local_florist" @click="activeCategory(props.row.id)"/>
-                </div>
-                <div v-if="!props.row.active">
-                  <q-btn size="10px" class="glossy" round color="deep-orange" icon="layers_clear" @click="activeCategory(props.row.id)"/>
-              </div>
-           </q-td>
-          <q-td key="actions" class="row">
-            <div class="col">
-              <q-btn class="col" size="12px" round color="green-5" icon="cached" @click="editCategory(props.row.id)" /> 
-            </div>
-             <div class="col">
-              <q-btn size="12px" round color="red-5" icon="delete"  @click="confirm(props.row.id)" />
-            </div>              
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
+    <div class="index_contenedor_table" v-if="select == 'Productos'">
+      <q-dialog v-model="showAddProduct">
+        <add-products @close="showAddProduct = false" />
+      </q-dialog>
+      <q-table
+        title="Table Products"
+        :rows="getProducts"
+        :columns="columns"
+        row-key="name"
+        binary-state-sort
+      >
+ 
+      </q-table>
     </div>
   </div> 
 </template>    
@@ -87,19 +56,27 @@ import Card from "components/dashboard/Card.vue";
 
 const linksList = [
           {
-            title: 'Categorias',
+            title: 'Herrero',
             totalEvents: 0,
             icon: 'date_range',
             active: false,
            // to: '#/events'
           },
+          {
+            title: 'Modena',
+            totalEvents: 0,
+            caption: '',
+            icon: 'contact_mail',
+             active: false,
+          },
 
 ];
 
 export default defineComponent({
-  name: "AdminProducts",
+  name: "AdminLine",
 
   components: {
+    addProducts,
     addCategories,
     Card,
   },
@@ -111,13 +88,13 @@ export default defineComponent({
       $q.dialog({
         dark: true,
         title: "Confirm",
-        message: "Would you delete to Category on list?",
+        message: "Would you delete to Product on list?",
         cancel: true,
         persistent: true,
       })
         .onOk(async () => {
           try {
-            const query = await db.collection("categories").doc(id).delete();
+            const query = await db.collection("products").doc(id).delete();
           } catch (error) {
             this.$q.notify({
               message: error,
@@ -128,9 +105,9 @@ export default defineComponent({
           }
         })
         .onOk(() => {
-          this.deleteCategory(id);
+          this.deleteProduct(id);
           this.$q.notify({
-            message: "Category Deleted successfully",
+            message: "Task Deleted successfully",
             type: "negative",
             position: "top-right",
             timeout: 1000,
@@ -145,50 +122,116 @@ export default defineComponent({
       essentialLinks: linksList,
       confirm,
       prompt,
-      select: ref('Categorias'),
-      options: ['Categorias']
+      select: ref('Productos'),
+      options: ['Productos', 'Categorias', 'Ventas', 'Compras']
     };
   },
 
   data() {
     return {
+      productsAux: [],
       categoriesAux: [],
+      salesAux: [],
+      showAddProduct: false,
       showAddCategory: false,
+      showAddSale: false,
+      showAddCompras: false,
       evento: null,
       totalEvento : 10,
     };
   },
 
   created() {
-    this.listCategories();
+   // this.listProducts();
+   // this.listCategories();
+  //  this.listSales();
+  //console.log(this.getCategories)
   },
 
 
   computed: {
-
-    ...mapState("categories/categories", ["categories",'columnsCategories']),
-    ...mapGetters("categories/categories", ["getCategories"]),
+   // ...mapState("products/products", ["products", "columns"]),
+   // ...mapState("categories/categories", ["categories",'columnsCategories']),
+   // ...mapState('sales/sales', ['sales','columnsSales']),
+    ...mapGetters("products/products", ["getProducts"]),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
-
+  //  ...mapGetters('sales/sales', ['getSales'])
   },
-
+/*
   methods: {
-    ...mapActions("categories/categories", ["setCategories","deleteCategory"]),
+    ...mapActions("products/products", ["setProducts", "deleteProduct"]),
+    ...mapActions("categories/categories", ["setCategories"]),
+    ...mapActions('sales/sales',["SET_SALES"]),
     ...mapActions('dashboard/dashboard', ['SET_PRODUCTS_TOTAL','SET_CATEGORIES_TOTAL','SET_SALES_TOTAL']),
 
     showform() {
       switch (this.select) {
+        case "Productos":
+          console.log("es Productos");
+        if (this.getProducts.length <= 0) {
+            this.$q.notify({
+              message: "No tienes Categorias Disponibles!!",
+              type: "warning",
+              position: "center",
+              timeout: 1000,
+              multiLine: false,
+            });
+            break;
+          } else {
+          this.showAddProduct = true;
+          break;
+          }
 
         case "Categorias":
-          console.log("es showAddCategory");
+          console.log("es Categorias");
            this.showAddCategory = true;
             break;
+
+        case "Ventas":
+          console.log("es Ventas");
+          this.showAddSale = true;
+              break;
+
+        case "Compras":
+          console.log("es Compras");
+          break;
 
         default:
         // code block
       }
     },
 
+    async listProducts() {
+      try {
+        if (true) {
+          console.log(this.getProducts);
+          var user = await auth.currentUser;
+          console.log(user.uid);
+          const resDb = await db.collection("products").where("author", "==", user.uid).get();
+          this.SET_PRODUCTS_TOTAL(resDb.size);
+
+          resDb.forEach((element) => {
+            const product = {
+              id: element.id,
+              name: element.data().name,
+              category: element.data().category,
+              description: element.data().description,
+              stock: element.data().stock,
+              cost: element.data().cost,
+              price: element.data().price,
+              stars: element.data().stars,
+              active: element.data().active,
+              model: element.data().model,
+              images: element.data().images,
+            };
+            this.productsAux.push(product);
+          });
+          this.setProducts(this.productsAux);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
 
     async listCategories() {
       try {
@@ -212,6 +255,83 @@ export default defineComponent({
     },
 
 
+    async listSales() {
+      try {
+        if (this.getSales.length <= 0) {
+          const resDb = await db.collection("orders").get();
+          this.SET_SALES_TOTAL(resDb.size);
+          resDb.forEach((element) => {
+            const order = {
+              id: element.id,
+              name: element.data().name,
+              email: element.data().email,
+              phone: element.data().phone,
+              active: element.data().active,
+            };
+            this.salesAux.push(order);
+          });
+          this.SET_SALES(this.salesAux);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async activeProduct(id) {
+      const product = this.products.find((product) => product.id === id);
+      if (product !== null) {
+        const washingtonRef = doc(db, "products", id);
+
+        await updateDoc(washingtonRef, {
+          active: !product.active,
+        })
+          .then((reesp) => {
+            const productsUpdate = this.products.map((p) => {
+              if (p.id === id) {
+                p.active = !p.active;
+              }
+              return p;
+            });
+            this.products = productsUpdate; // hay que colocar el action correspondiente para actualizar
+          })
+          .catch((error) => {
+            console.log("erro :", error);
+          });
+      }
+    },
+
+    async editProduct(id) {
+      const product = this.products.find((product) => product.id === id);
+      if (product !== null) {
+        const washingtonRef = doc(db, "products", id);
+
+        // Set the "capital" field of the city 'DC'
+        await updateDoc(washingtonRef, {
+          name: product.name,
+          category: product.category,
+          description: product.description,
+          stock: product.stock,
+          cost: product.cost,
+          price: product.price,
+          stars: product.stars,
+          active: product.active,
+          model: product.model,
+          imgaes: product.images,
+        })
+          .then((reesp) => {
+            this.$q.notify({
+              message: "Task updated successfully",
+              type: "positive",
+              position: "top-right",
+              timeout: 1000,
+              multiLine: false,
+            });
+          })
+          .catch((error) => {
+            console.log("erro :", error);
+          });
+      }
+    },
 
    async activeCategory(id) {
       const category = this.categories.find(category => category.id === id);
@@ -265,9 +385,32 @@ export default defineComponent({
       }
     },
 
+   async activeSale(id){
+      const sale = this.sales.find(sale => sale.id === id);
+      if(sale !== null){
+        const washingtonRef = doc(db, "orders", id);
+
+        await updateDoc(washingtonRef, {
+                      active: !sale.active,
+        })
+        .then( (resp) => {
+            const salesUpdate = this.sales.map(p => {
+              if(p.id === id){
+                p.active = !p.active
+              }
+              return p;
+              });
+           this.sales = salesUpdate;            
+        })
+        .catch( (error) => {
+          console.log('erro :', error)
+        });
+
+      }
+    },
 
   },
-
+*/
 
 });
 </script>
