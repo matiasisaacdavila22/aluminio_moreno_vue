@@ -23,7 +23,7 @@
                       <q-select outlined v-model="productToSubmit.line" :options="getNameLines" label="Linea" :rules="[val => !!val || 'Field is required']" ref="linea"/>
                     </div>
                     <div class="col-6">
-                        <q-input outlined v-model="productToSubmit.model" label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
+                        <q-select outlined v-model="productToSubmit.model"  :options="getNameModels"  label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
                     </div>
                     <div class="col-6">
                           <q-input outlined v-model="productToSubmit.name" label="Medida-cm (alto*ancho)" :rules="[val => !!val || 'Field is required']" ref="measure"/>
@@ -97,6 +97,8 @@ export default {
        data() {
             return {
                 categoriesAux: [],
+                linesAux:[],
+                modelsAux: [],
 
                 productToSubmit: {               
                      line: '',
@@ -117,18 +119,23 @@ export default {
     
       created() {
           this.listCategories();
+          this.listLines();
+          this.listModels();
         },
 
         computed: {
               ...mapState('categories/categories',['categories']),
               ...mapGetters('categories/categories', ['getCategories', 'getNameCategories']),
               ...mapGetters('lines/lines', ['getLines', 'getNameLines']),
+              ...mapGetters('models/models', ['getModels','getNameModels'])
 
             },
 
         methods: {
             ...mapActions('products/products', ['addProduct']),
             ...mapActions('categories/categories',['setCategories']),
+            ...mapActions('lines/lines',['setLines']),
+            ...mapActions('models/models',['setModels']),
    
 
         async listCategories() {
@@ -150,6 +157,48 @@ export default {
               console.log(error)
             }
           },
+
+          async listLines() {
+            try {
+               if(this.getLines.length <= 0){
+              const resDb = await db.collection('lines').get();
+              resDb.forEach(element => {
+                const line = {
+                        id: element.id,
+                        name: element.data().name,
+                        description: element.data().description,
+                        active: element.data().active,
+                  }
+                this.linesAux.push(line);  
+              });
+            this.setLines(this.linesAux);
+               }
+            } catch (error) {
+              console.log(error)
+            }
+          },
+                  
+          async listModels() {
+            try {
+               if(this.getModels.length <= 0){
+              const resDb = await db.collection('models').get();
+              resDb.forEach(element => {
+                const model = {
+                        id: element.id,
+                        name: element.data().name,
+                        description: element.data().description,
+                        active: element.data().active,
+                  }
+                this.modelsAux.push(model);  
+              });
+            this.setModels(this.modelsAux);
+               }
+            } catch (error) {
+              console.log(error)
+            }
+          },
+
+
 
 
             submitForm() {
