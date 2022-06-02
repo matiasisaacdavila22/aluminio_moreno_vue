@@ -104,6 +104,12 @@ const linksList = [
     icon: 'config',
     to: '/admin/line'
   },
+    {
+    name: 'Modelos',
+    description: 'administracion Modelos',
+    icon: 'config',
+    to: '/admin/model'
+  },
   {
     name: 'Config',
     description: 'administracion y Configuracion',

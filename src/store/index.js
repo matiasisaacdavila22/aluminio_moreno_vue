@@ -4,6 +4,7 @@ import products from './products';
 import categories from './categories';
 import dashboard from './dashboard';
 import lines from './lines';
+import models from './models';
 
 // import example from './module-example'
 
@@ -23,6 +24,7 @@ export default store(function (/* { ssrContext } */) {
       categories,
       dashboard,
       lines,
+      models,
     },
 
     // enable strict mode (adds overhead!)
