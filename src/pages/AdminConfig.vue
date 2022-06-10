@@ -17,27 +17,10 @@
       />
     </div>
     <div class="q-pa-md">
-      <q-btn
-        label="Agregar +"
-        color="primary"
-        @click="showform(); evento = { title: 'Agregar', action: 'add', card: this.select };"
-      />
+
     </div>
 
-    <div class="index_contenedor_table" v-if="select == 'Productos'">
-      <q-dialog v-model="showAddProduct">
-        <add-products @close="showAddProduct = false" />
-      </q-dialog>
-      <q-table
-        title="Table Products"
-        :rows="getProducts"
-        :columns="columns"
-        row-key="name"
-        binary-state-sort
-      >
- 
-      </q-table>
-    </div>
+
   </div> 
 </template>    
 
