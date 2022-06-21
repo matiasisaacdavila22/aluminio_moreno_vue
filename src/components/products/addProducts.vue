@@ -26,7 +26,7 @@
                         <q-select outlined v-model="productToSubmit.model"  :options="getNameModels"  label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
                     </div>
                     <div class="col-6">
-                          <q-input outlined v-model="productToSubmit.name" label="Medida-cm (alto*ancho)" :rules="[val => !!val || 'Field is required']" ref="measure"/>
+                          <q-input outlined v-model="productToSubmit.name" label="Medida-cm (ancho*alto)" :rules="[val => !!val || 'Field is required']" ref="measure"/>
                     </div>
                     <div class="col-6">    
                       <q-input outlined v-model="productToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>

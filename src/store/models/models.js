@@ -8,10 +8,18 @@ export default {
       
             columnsModels : [
                 { name: 'name',required: true,label: 'MODELO',align: 'left',field: row => row.name,format: val => `${val}`,sortable: true},
-                { name: 'description', label: 'DESCRIPCION', field: 'description', sortable: true, style: 'width: 10px' },
+                { name: 'cost', label: 'COSTO', field: 'cost', sortable: true, style: 'width: 10px' },
+                { name: 'factor', label: 'FACTOR', field: 'factor', sortable: true, style: 'width: 10px' },
+                { name: 'description', label: 'DESCRIPCION', field: 'description', sortable: true, style: 'width: 10px' },       
+                { name: 'activeFactor', label: 'ACTIVE-FACTOR', field: 'activeFactor'},
                 { name: 'active', label: 'ACTIVE', field: 'active'},
                 { name: 'actions', label: 'ACTIONS', field: 'actions'}
               ],
+
+           factores: [
+             "Metro",
+             "Peso"
+           ]   
               
        },
 
@@ -57,6 +65,10 @@ export default {
                 names.push(element.name);
               });
               return names;
+            },
+
+            getFactores(state, getters){
+              return state.factores;
             }
 
       }

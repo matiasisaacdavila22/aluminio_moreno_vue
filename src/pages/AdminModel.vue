@@ -43,12 +43,32 @@
               <q-input v-model="scope.value" dense autofocus counter hint="Use buttons to close"/>
             </q-popup-edit>
           </q-td>
+          <q-td key="cost" :props="props">
+            {{ props.row.cost }}
+            <q-popup-edit v-model="props.row.cost" title="Update Cost" buttons persistent  v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus counter hint="Use buttons to close"/>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="factor" :props="props">
+            {{ props.row.factor }}
+            <q-popup-edit v-model="props.row.factor" title="Update factor" buttons persistent  v-slot="scope">
+             <q-select outlined v-model="scope.value"  :options="getFactores" label="Outlined" />
+            </q-popup-edit>
+          </q-td>
           <q-td key="description" :props="props">
             <div class="text-pre-wrap">{{ props.row.description.slice(0,35)}}</div>
             <q-popup-edit v-model="props.row.description" title="Update Description" buttons persistent  v-slot="scope">
               <q-input type="textarea" v-model="scope.value" dense autofocus hint="Use buttons to close"/>
             </q-popup-edit>
           </q-td>
+            <q-td key="activeFactor" :props="props">
+              <div v-if="props.row.activeFactor">
+                    <q-btn size="10px" class="glossy" round color="secondary" icon="local_florist" @click="activeFactor(props.row.id)"/>
+                </div>
+                <div v-if="!props.row.activeFactor">
+                  <q-btn size="10px" class="glossy" round color="deep-orange" icon="layers_clear" @click="activeFactor(props.row.id)"/>
+              </div>
+           </q-td>
            <q-td key="active" :props="props">
               <div v-if="props.row.active">
                     <q-btn size="10px" class="glossy" round color="secondary" icon="local_florist" @click="activeModel(props.row.id)"/>
@@ -164,7 +184,7 @@ export default defineComponent({
 
   computed: {
     ...mapState("models/models", ["models",'columnsModels']),
-    ...mapGetters("models/models", ["getModels"]),
+    ...mapGetters("models/models", ["getModels", "getFactores"]),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
   },
 
@@ -196,6 +216,9 @@ export default defineComponent({
               name: element.data().name,
               description: element.data().description,
               active: element.data().active,
+              cost: element.data().cost,
+              factor: element.data().factor,
+              activeFactor: element.data().activeFactor
             };
             this.modelsAux.push(model);
           });
@@ -230,6 +253,30 @@ export default defineComponent({
 
       }
     },
+
+       async activeFactor(id) {
+      const model = this.models.find(model => model.id === id);
+      if(model !== null){
+        const washingtonRef = doc(db, "models", id);
+
+        await updateDoc(washingtonRef, {
+                      activeFactor: !model.activeFactor,
+        })
+        .then( (resp) => {
+            const modelUpdate = this.models.map(p => {
+              if(p.id === id){
+                p.activeFactor = !p.activeFactor
+              }
+              return p;
+              });
+           this.models = modelUpdate;            
+        })
+        .catch( (error) => {
+          console.log('erro :', error)
+        });
+
+      }
+    },
  
 
    async editModel(id) {
@@ -242,6 +289,9 @@ export default defineComponent({
                   name: model.name,
                   description: model.description,
                   active: model.active,
+                  active: model.activeFactor,
+                  cost: model.cost,
+                  factor: model.factor
         })
         .then( (reesp) => {
                   this.$q.notify({

@@ -21,6 +21,26 @@
             <div>    
               <q-input type="textarea" outlined v-model="modelToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
             </div>
+                  <div>
+                  <q-toggle
+                    label="Active Multiplicador"
+                    v-model="modelToSubmit.activeFactor"
+                    checked-icon="check"
+                    color="green"
+                    unchecked-icon="clear"
+                  />
+                </div>
+        
+                  <div class="row" style="max-width: 800px">
+                    <div class="col-5">
+                       <q-select outlined v-model="modelToSubmit.factor" :options="getFactores" :disable="!modelToSubmit.activeFactor" label="Multiplicador de costo" :rules="[val => !!val || 'Field is required']" ref="category"/>
+                    </div>
+                  <div class="col-4">
+                    <q-input outlined v-model="modelToSubmit.cost" :disable="!modelToSubmit.activeFactor" label="Costo" :rules="[val => !!val || 'Field is required']" ref="cost"/>
+                  </div>
+                    
+                  </div>
+       
             <div>
               <q-toggle
                 label="Active"
@@ -45,17 +65,22 @@
 
 <script>
 import {db} from "boot/firebase";
-import { mapActions } from 'vuex'
 import { auth } from 'boot/firebase'
 import { ref } from 'vue';
+import { mapState, mapActions, mapGetters } from "vuex";
+
+
 
 export default {
        data() {
             return {
-                modelToSubmit: {
+                  modelToSubmit: {
                      name: '',
                      description: '',
+                     cost: 0,
+                     factor:'Metro',
                      active: true,
+                     activeFactor: false,
                      author: '',          
                 },
                
@@ -73,8 +98,13 @@ export default {
        this.modelToSubmit.author = user;
        console.log(user.uid)
       }, 
-    
-        methods: {
+
+
+    computed: {
+      ...mapGetters("models/models", ["getModels", "getFactores"]),
+    },
+
+    methods: {
             ...mapActions('models/models', ['addModel']),
 
             submitForm() {
