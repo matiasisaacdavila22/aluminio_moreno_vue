@@ -23,19 +23,37 @@
                       <q-select outlined v-model="productToSubmit.line" :options="getNameLines" label="Linea" :rules="[val => !!val || 'Field is required']" ref="linea"/>
                     </div>
                     <div class="col-6">
-                        <q-select outlined v-model="productToSubmit.model"  :options="getNameModels"  label="Model" :rules="[val => !!val || 'Field is required']" ref="model"/>
+                        <q-select outlined v-model="productToSubmit.model" option-value="id" option-label="name" :options="getModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
+                        <!--  <h6>{{productToSubmit.model}}</h6> -->
                     </div>
-                    <div class="col-6">
-                          <q-input outlined v-model="productToSubmit.name" label="Medida-cm (ancho*alto)" :rules="[val => !!val || 'Field is required']" ref="measure"/>
+                    <div class="col-12" v-if="productToSubmit.model.activeFactor">
+                      <div class="row">
+                        <div class="col-3">
+                              <q-input outlined v-model="productToSubmit.model.factor" :disable="true" label="Factor" :rules="[val => !!val || 'Field is required']" ref="factor"/>
+                        </div>
+                        <div class="col-3">    
+                          <q-input outlined v-model="productToSubmit.model.cost" :label="'Costo x '+productToSubmit.model.factor" disable  :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                        </div>
+                        <div class="col-3">    
+                          <q-input outlined v-model="productToSubmit.amountMaterial" :label=productToSubmit.model.factor :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                        </div>
+                        <div class="col-3">    
+                          <q-input outlined v-model.number="calculateCost" disable label="Cost" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+               
+                        </div>
+                      </div>
                     </div>
+                    <div class="col-6" v-if="!productToSubmit.model.activeFactor">
+                         <q-input outlined v-model="productToSubmit.cost" label="Cost" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                     </div>
+
                     <div class="col-6">    
                       <q-input outlined v-model="productToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
                     </div>
-                    <div class="col-6">    
-                      <q-input outlined v-model="productToSubmit.cost" label="Cost" disable  :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
-                    </div>
+    
+
                     <div class="col-6">  
-                      <q-input outlined v-model="productToSubmit.price" label="Price" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
+                      <q-input outlined v-model="total" label="Price" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
                     </div>
                     <div class="col-6">  
                       <q-input outlined v-model="productToSubmit.stock" label="Stock" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="stock"/>
@@ -105,7 +123,8 @@ export default {
                      model:'',
                      category: '',
                      description: '',
-                     cost: '',
+                     cost:'',
+                     amountMaterial:'',
                      price: '',
                      stock: '',
                      stars: '',
@@ -113,7 +132,6 @@ export default {
                      active: true,          
                 },
                 images: [],
-               
             }
         },
     
@@ -127,7 +145,15 @@ export default {
               ...mapState('categories/categories',['categories']),
               ...mapGetters('categories/categories', ['getCategories', 'getNameCategories']),
               ...mapGetters('lines/lines', ['getLines', 'getNameLines']),
-              ...mapGetters('models/models', ['getModels','getNameModels'])
+              ...mapGetters('models/models', ['getModels','getNameModels']),
+
+     calculateCost() {
+       if(this.productToSubmit.model.cost){
+           this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.amountMaterial;
+           return this.productToSubmit.cost;
+       }
+ 
+        },  
 
             },
 
@@ -136,6 +162,8 @@ export default {
             ...mapActions('categories/categories',['setCategories']),
             ...mapActions('lines/lines',['setLines']),
             ...mapActions('models/models',['setModels']),
+
+  
    
 
         async listCategories() {
@@ -188,6 +216,9 @@ export default {
                         name: element.data().name,
                         description: element.data().description,
                         active: element.data().active,
+                        activeFactor: element.data().activeFactor,
+                        cost: element.data().cost,
+                        factor: element.data().factor
                   }
                 this.modelsAux.push(model);  
               });
@@ -210,7 +241,7 @@ export default {
                 //  && !this.$refs.category.hasError 
                 //  && !this.$refs.model.hasError 
                 //  && !this.$refs.description.hasError 
-                //  && !this.$refs.cost.hasError 
+                //  && !this.$refs.name.hasError 
                 //  && !this.$refs.price.hasError 
                   && !this.$refs.stock.hasError ){
              //     this.upImages();  
