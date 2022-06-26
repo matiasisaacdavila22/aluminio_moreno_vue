@@ -17,50 +17,77 @@
          
               <div class="row" style="max-width:500px">
                     <div class="col-6">   
-                      <q-select outlined v-model="productToSubmit.category" :options="getNameCategories" label="Categories" :rules="[val => !!val || 'Field is required']" ref="category"/>
+                      <q-select outlined v-model="productToSubmit.categoryId" map-options emit-value option-value="id" option-label="name"
+                       :options="getCategories" label="Categories" :rules="[val => !!val || 'Field is required']" ref="categoryId"/>
                     </div>
-                    <div class="col-6">   
-                      <q-select outlined v-model="productToSubmit.line" :options="getNameLines" label="Linea" :rules="[val => !!val || 'Field is required']" ref="linea"/>
+                   <div class="col-6">   
+                      <q-select outlined v-model="productToSubmit.lineId" map-options emit-value option-value="id" option-label="name"
+                       :options="getLines" label="Linea" :rules="[val => !!val || 'Field is required']" ref="lineId"/>
                     </div>
                     <div class="col-6">
-                        <q-select outlined v-model="productToSubmit.model" option-value="id" option-label="name" :options="getModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
-                        <!--  <h6>{{productToSubmit.model}}</h6> -->
+                        <q-select outlined v-model="productToSubmit.model" option-label="name" 
+                        :options="getModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
                     </div>
                     <div class="col-12" v-if="productToSubmit.model.activeFactor">
                       <div class="row">
                         <div class="col-3">
-                              <q-input outlined v-model="productToSubmit.model.factor" :disable="true" label="Factor" :rules="[val => !!val || 'Field is required']" ref="factor"/>
+                              <q-input outlined v-model="productToSubmit.model.factor" :disable="true" label="Factor" :rules="[val => !!val || 'Field is required']" ref="model.factor"/>
                         </div>
                         <div class="col-3">    
-                          <q-input outlined v-model="productToSubmit.model.cost" :label="'Costo x '+productToSubmit.model.factor" disable  :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                          <q-input outlined v-model="productToSubmit.model.cost" :label="'Costo x '+productToSubmit.model.factor" disable  
+                          :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="model.cost"/>
                         </div>
                         <div class="col-3">    
-                          <q-input outlined v-model="productToSubmit.amountMaterial" :label=productToSubmit.model.factor :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                          <q-input outlined v-model="productToSubmit.amountMaterial"  label-color="purple-8" :label=productToSubmit.model.factor 
+                          :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="amountMaterial"/>
                         </div>
                         <div class="col-3">    
-                          <q-input outlined v-model.number="calculateCost" disable label="Cost" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                          <q-input outlined v-model.number="calculateCost" disable label="Cost" 
+                          :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
                
                         </div>
                       </div>
                     </div>
                     <div class="col-6" v-if="!productToSubmit.model.activeFactor">
-                         <q-input outlined v-model="productToSubmit.cost" label="Cost" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
+                         <q-input outlined v-model="productToSubmit.cost" label="Cost" 
+                         :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
                      </div>
-
+      
+                    <div class="col-12">  
+                      <q-toggle
+                        label="Active-%"
+                        v-model="productToSubmit.activePercentage"
+                        checked-icon="check"
+                        color="green"
+                        unchecked-icon="clear"
+                      />
+                    </div>
+                    <div class="col-4">  
+                      <q-input outlined v-model="productToSubmit.percentage" label="%"
+                       :disable="!productToSubmit.activePercentage" 
+                       :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="percentage"/>
+                    </div>
+                    <div class="col-6" v-if="productToSubmit.activePercentage">  
+                      <q-input outlined v-model="calculatePrice" label="Price"
+                       :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
+                    </div>
+                    <div class="col-6" v-if="!productToSubmit.activePercentage">  
+                      <q-input outlined v-model="productToSubmit.price" label="Price" 
+                      :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
+                    </div>
                     <div class="col-6">    
                       <q-input outlined v-model="productToSubmit.description" label="Description" :rules="[val => !!val || 'Field is required']" ref="description"/>
                     </div>
     
 
+
                     <div class="col-6">  
-                      <q-input outlined v-model="total" label="Price" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="price"/>
-                    </div>
-                    <div class="col-6">  
-                      <q-input outlined v-model="productToSubmit.stock" label="Stock" :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="stock"/>
+                      <q-input outlined v-model="productToSubmit.stock" label="Stock" 
+                      :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="stock"/>
                     </div>
                     <div class="col-6">  
                       <q-toggle
-                        label="Active"
+                        label="Active-Product"
                         v-model="productToSubmit.active"
                         checked-icon="check"
                         color="green"
@@ -119,17 +146,19 @@ export default {
                 modelsAux: [],
 
                 productToSubmit: {               
-                     line: '',
+                     lineId: '',
                      model:'',
-                     category: '',
+                     categoryId: '',
                      description: '',
                      cost:'',
                      amountMaterial:'',
+                     percentage:'',
                      price: '',
                      stock: '',
                      stars: '',
                      images: [],
-                     active: true,          
+                     active: true,
+                     activePercentage:false          
                 },
                 images: [],
             }
@@ -147,15 +176,28 @@ export default {
               ...mapGetters('lines/lines', ['getLines', 'getNameLines']),
               ...mapGetters('models/models', ['getModels','getNameModels']),
 
-     calculateCost() {
-       if(this.productToSubmit.model.cost){
-           this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.amountMaterial;
-           return this.productToSubmit.cost;
-       }
- 
-        },  
+              calculateCost() {
+                if(this.productToSubmit.model.cost){
+                    this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.amountMaterial;
+                    return this.productToSubmit.cost;
+                    }
+                  }, 
+                  
 
-            },
+                calculatePrice() {
+                        if(this.productToSubmit.activePercentage){
+                              if(this.productToSubmit.percentage > 0 ){
+                                      let percentage = ((this.productToSubmit.percentage * this.productToSubmit.cost)/ 100)
+                                      this.productToSubmit.price = parseFloat(percentage)+parseFloat(this.productToSubmit.cost);
+                                      return  this.productToSubmit.price;
+                              }else{
+                                    this.productToSubmit.price = this.productToSubmit.cost;
+                                      return  this.productToSubmit.price;
+                              }
+                          }
+                          return 0;
+                      },
+        },
 
         methods: {
             ...mapActions('products/products', ['addProduct']),
@@ -163,8 +205,6 @@ export default {
             ...mapActions('lines/lines',['setLines']),
             ...mapActions('models/models',['setModels']),
 
-  
-   
 
         async listCategories() {
             try {
@@ -188,7 +228,7 @@ export default {
 
           async listLines() {
             try {
-               if(this.getLines.length <= 0){
+             if(this.getLines.length <= 0){
               const resDb = await db.collection('lines').get();
               resDb.forEach(element => {
                 const line = {
@@ -208,6 +248,7 @@ export default {
                   
           async listModels() {
             try {
+         
                if(this.getModels.length <= 0){
               const resDb = await db.collection('models').get();
               resDb.forEach(element => {
@@ -223,7 +264,7 @@ export default {
                 this.modelsAux.push(model);  
               });
             this.setModels(this.modelsAux);
-               }
+                              }
             } catch (error) {
               console.log(error)
             }
@@ -271,8 +312,10 @@ export default {
               try { 
                      var user = await auth.currentUser;
                      this.productToSubmit.author = user.uid; 
+                     this.productToSubmit.modelId = this.productToSubmit.model.id;
+                     delete this.productToSubmit.model;
                      const query = await db.collection('products').add(
-                     this.productToSubmit
+                    this.productToSubmit
                  )
                  .then( (res) => {
                    this.productToSubmit.id = res.id;
