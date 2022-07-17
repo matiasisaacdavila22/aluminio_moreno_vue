@@ -16,6 +16,9 @@
              <q-card-section class="container2">
          
               <div class="row" style="max-width:500px">
+                    <div class="col-6">    
+                      <q-input outlined v-model="productToSubmit.name" label="Name" :rules="[val => !!val || 'Field is required']" ref="name"/>
+                    </div>
                     <div class="col-6">   
                       <q-select outlined v-model="productToSubmit.categoryId" map-options emit-value option-value="id" option-label="name"
                        :options="getCategories" label="Categories" :rules="[val => !!val || 'Field is required']" ref="categoryId"/>
@@ -26,7 +29,7 @@
                     </div>
                     <div class="col-6">
                         <q-select outlined v-model="productToSubmit.model" option-label="name" 
-                        :options="getModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
+                        :options="gettersModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
                     </div>
                     <div class="col-12" v-if="productToSubmit.model.activeFactor">
                       <div class="row">
@@ -39,7 +42,7 @@
                         </div>
                         <div class="col-3">    
                           <q-input outlined v-model="productToSubmit.amountMaterial"  label-color="purple-8" :label=productToSubmit.model.factor 
-                          :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="amountMaterial"/>
+                          :rules="[val => !!val || 'Field is required' , val => (val.length > 0 && val.length < 100 ) || 'Please type a number greater than zero', isValidMountMaterial]" ref="amountMaterial"/>
                         </div>
                         <div class="col-3">    
                           <q-input outlined v-model.number="calculateCost" disable label="Cost" 
@@ -119,11 +122,13 @@ import { ref } from 'vue'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { useQuasar } from 'quasar';
 import { auth } from 'boot/firebase';
+import productComposable from '../../composables/productComposables';
 
 export default {
     
        setup () {
          const $q = useQuasar()
+         const { listProducts } = productComposable();
 
         function onRejected (rejectedEntries) {
           $q.notify({
@@ -136,6 +141,7 @@ export default {
               model: ref(null),
               onRejected,
               filesMaxNumber: ref(null),
+              listProducts,
           }
        },
 
@@ -147,6 +153,7 @@ export default {
 
                 productToSubmit: {               
                      lineId: '',
+                     name: '',
                      model:'',
                      categoryId: '',
                      description: '',
@@ -174,19 +181,27 @@ export default {
               ...mapState('categories/categories',['categories']),
               ...mapGetters('categories/categories', ['getCategories', 'getNameCategories']),
               ...mapGetters('lines/lines', ['getLines', 'getNameLines']),
-              ...mapGetters('models/models', ['getModels','getNameModels']),
+              ...mapGetters('models/models', ['gettersModels','getNameModels']),
 
               calculateCost() {
                 if(this.productToSubmit.model.cost){
+                    if(this.productToSubmit.model.factor == 'Peso'){
                     this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.amountMaterial;
                     return this.productToSubmit.cost;
+                    }else{
+                      let mountMaterial = this.productToSubmit.amountMaterial.split('*');
+                      return (mountMaterial[0]*mountMaterial[1])*this.productToSubmit.model.cost;
+                    }
+
                     }
                   }, 
                   
 
                 calculatePrice() {
                         if(this.productToSubmit.activePercentage){
+                          console.log(this.productToSubmit)
                               if(this.productToSubmit.percentage > 0 ){
+                                     
                                       let percentage = ((this.productToSubmit.percentage * this.productToSubmit.cost)/ 100)
                                       this.productToSubmit.price = parseFloat(percentage)+parseFloat(this.productToSubmit.cost);
                                       return  this.productToSubmit.price;
@@ -200,7 +215,7 @@ export default {
         },
 
         methods: {
-            ...mapActions('products/products', ['addProduct']),
+            ...mapActions('products/products', ['addProduct','setProducts']),
             ...mapActions('categories/categories',['setCategories']),
             ...mapActions('lines/lines',['setLines']),
             ...mapActions('models/models',['setModels']),
@@ -249,7 +264,7 @@ export default {
           async listModels() {
             try {
          
-               if(this.getModels.length <= 0){
+               if(this.gettersModels.length <= 0){
               const resDb = await db.collection('models').get();
               resDb.forEach(element => {
                 const model = {
@@ -270,7 +285,16 @@ export default {
             }
           },
 
-
+            isValidMountMaterial(val){
+           if(this.productToSubmit.model.factor == 'Metro'){
+                const mountMateriaPattern = /[0-9]+\*[0-9]/;
+                return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
+           }
+            if(this.productToSubmit.model.factor == 'Peso'){
+                const mountMateriaPattern = /[0-9]/;
+                return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
+            }
+            },
 
 
             submitForm() {
@@ -319,8 +343,11 @@ export default {
                  )
                  .then( (res) => {
                    this.productToSubmit.id = res.id;
-                   this.addProduct(this.productToSubmit)
-                   this.$emit('close');
+                    this.listProducts()
+                      .then( data => {
+                         this.setProducts(data);
+                      })
+                  this.$emit('close');
                   })
                   .then( res => {
                   this.$q.notify({

@@ -101,7 +101,7 @@ export default {
 
 
     computed: {
-      ...mapGetters("models/models", ["getModels", "getFactores"]),
+      ...mapGetters("models/models", ["gettersModels", "getFactores"]),
     },
 
     methods: {

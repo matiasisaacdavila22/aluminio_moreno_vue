@@ -55,7 +55,7 @@ export default {
 
       getters: {
 
-            getModels(state, getters){
+            gettersModels(state, getters){
               return state.models;
             },
 

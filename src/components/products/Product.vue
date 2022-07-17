@@ -25,7 +25,7 @@
           </div>
         </div>
       <div class="text-subtitle1">
-          ・{{product.name.slice(0,30)}}__  $ {{product.price}}
+          ・{{product.name.slice(0,30)}}  $ {{product.price}}
         </div>
                <div class="text-caption text-grey">
         {{ product.description.slice(0,80)}}

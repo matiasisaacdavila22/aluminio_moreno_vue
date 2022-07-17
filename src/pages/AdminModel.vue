@@ -30,7 +30,7 @@
       </q-dialog>
       <q-table
         title="Table Models"
-        :rows="getModels"
+        :rows="gettersModels"
         :columns="columnsModels"
         row-key="name"
         binary-state-sort
@@ -102,7 +102,7 @@ import addModels from "components/models/addModels.vue";
 import { ref } from "vue";
 import { auth } from "boot/firebase";
 import Card from "components/dashboard/Card.vue";
-
+import modelCoposable from "../composables/modelComposable";
 
 const linksList = [
           {
@@ -124,6 +124,7 @@ export default defineComponent({
 
   setup() {
     const $q = useQuasar();
+    const { listModels } = modelCoposable();
 
     function confirm(id) {
       $q.dialog({
@@ -164,7 +165,8 @@ export default defineComponent({
       confirm,
       prompt,
       select: ref('Modelos'),
-      options: ['Modelelos']
+      options: ['Modelelos'],
+      listModels,
     };
   },
 
@@ -178,13 +180,13 @@ export default defineComponent({
   },
 
   created() {
-   this.listModels();
+   this.getModels();
   },
 
 
   computed: {
     ...mapState("models/models", ["models",'columnsModels']),
-    ...mapGetters("models/models", ["getModels", "getFactores"]),
+    ...mapGetters("models/models", ["gettersModels", "getFactores"]),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
   },
 
@@ -205,27 +207,17 @@ export default defineComponent({
       }
     },
 
-    async listModels() {
+    async getModels() {
       try {
-        if (this.getModels.length <= 0) {
-          const resDb = await db.collection("models").get();
-          //  this.SET_CATEGORIES_TOTAL(resDb.size);
-          resDb.forEach((element) => {
-            const model = {
-              id: element.id,
-              name: element.data().name,
-              description: element.data().description,
-              active: element.data().active,
-              cost: element.data().cost,
-              factor: element.data().factor,
-              activeFactor: element.data().activeFactor
-            };
-            this.modelsAux.push(model);
-          });
-          this.setModels(this.modelsAux);
+        if(this.gettersModels.length <= 0 ){
+          this.listModels()
+            .then(data => {
+              this.setModels(data);
+              console.log('models : ',data)
+            })
         }
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
     },
 

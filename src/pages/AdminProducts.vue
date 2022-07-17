@@ -120,6 +120,7 @@ import addCategories from 'components/categories/addCategories.vue';
 import { ref } from "vue";
 import { auth } from "boot/firebase";
 import Card from "components/dashboard/Card.vue";
+import modelCoposable from "../composables/modelComposable";
 
 const linksList = [
           {
@@ -164,6 +165,7 @@ export default defineComponent({
 
   setup() {
     const $q = useQuasar();
+    const { listModels } = modelCoposable();
 
     function confirm(id) {
       $q.dialog({
@@ -203,7 +205,8 @@ export default defineComponent({
       confirm,
       prompt,
       select: ref('Productos'),
-      options: ['Productos', 'Categorias', 'Ventas', 'Compras']
+      options: ['Productos', 'Categorias', 'Ventas', 'Compras'],
+      listModels,
     };
   },
 
@@ -222,10 +225,10 @@ export default defineComponent({
   },
 
   created() {
-    this.listProducts();
+    this.getModels();
     this.listCategories();
-  //  this.listSales();
-  },
+    this.listProducts();
+   },
 
 
   computed: {
@@ -235,13 +238,13 @@ export default defineComponent({
    // ...mapState('sales/sales', ['sales','columnsSales']),
     ...mapGetters("products/products", ["getProducts"]),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
-  //  ...mapGetters('sales/sales', ['getSales'])
+    ...mapGetters('models/models', ['gettersModels'])
   },
 
   methods: {
     ...mapActions("products/products", ["setProducts", "deleteProduct"]),
     ...mapActions("categories/categories", ["setCategories"]),
-    //...mapActions('sales/sales',["SET_SALES"]),
+    ...mapActions('models/models',["setModels"]),
     ...mapActions('dashboard/dashboard', ['SET_PRODUCTS_TOTAL','SET_CATEGORIES_TOTAL','SET_SALES_TOTAL']),
 
     showform() {
@@ -284,27 +287,44 @@ export default defineComponent({
           console.log(user.uid);
           const resDb = await db.collection("products").where("author", "==", user.uid).get();
           this.SET_PRODUCTS_TOTAL(resDb.size);
-
+          console.log(resDb);
           resDb.forEach((element) => {
+            let category = this.getCategories.filter(val => val.id == element.data().categoryId);
+            let model = this.gettersModels.filter( val => val.id == element.data().modelId);
             const product = {
               id: element.id,
               name: element.data().name,
-              category: element.data().category,
+              category: category[0].name,
               description: element.data().description,
               stock: element.data().stock,
               cost: element.data().cost,
               price: element.data().price,
               stars: element.data().stars,
               active: element.data().active,
-              model: element.data().model,
+              model: model[0].name,
               images: element.data().images,
             };
             this.productsAux.push(product);
           });
           this.setProducts(this.productsAux);
+        console.log(this.productsAux)
         }
       } catch (error) {
         console.log(error);
+      }
+    },
+
+    async getModels(){
+      try {
+        if(this.gettersModels.length <= 0 ){
+          this.listModels()
+            .then(data => {
+              this.setModels(data);
+              console.log('models : ',data)
+            })
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
 
