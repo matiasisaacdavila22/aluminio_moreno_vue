@@ -189,6 +189,7 @@ export default defineComponent({
         })
         .onOk(() => {
           this.deleteProduct(id);
+          this.SET_PRODUCTS_TOTAL(this.getProducts.length)
           this.$q.notify({
             message: "Task Deleted successfully",
             type: "negative",

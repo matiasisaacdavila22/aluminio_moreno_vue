@@ -190,7 +190,8 @@ export default {
                     return this.productToSubmit.cost;
                     }else{
                       let mountMaterial = this.productToSubmit.amountMaterial.split('*');
-                      return (mountMaterial[0]*mountMaterial[1])*this.productToSubmit.model.cost;
+                      this.productToSubmit.cost = (mountMaterial[0]*mountMaterial[1])*this.productToSubmit.model.cost;
+                      return this.productToSubmit.cost;
                     }
 
                     }
@@ -199,10 +200,8 @@ export default {
 
                 calculatePrice() {
                         if(this.productToSubmit.activePercentage){
-                          console.log(this.productToSubmit)
                               if(this.productToSubmit.percentage > 0 ){
-                                     
-                                      let percentage = ((this.productToSubmit.percentage * this.productToSubmit.cost)/ 100)
+                                     let percentage = ((this.productToSubmit.percentage * this.productToSubmit.cost)/ 100)
                                       this.productToSubmit.price = parseFloat(percentage)+parseFloat(this.productToSubmit.cost);
                                       return  this.productToSubmit.price;
                               }else{
@@ -219,7 +218,7 @@ export default {
             ...mapActions('categories/categories',['setCategories']),
             ...mapActions('lines/lines',['setLines']),
             ...mapActions('models/models',['setModels']),
-
+            ...mapActions('dashboard/dashboard', ['SET_PRODUCTS_TOTAL','SET_CATEGORIES_TOTAL','SET_SALES_TOTAL']),
 
         async listCategories() {
             try {
@@ -346,6 +345,7 @@ export default {
                     this.listProducts()
                       .then( data => {
                          this.setProducts(data);
+                         this.SET_PRODUCTS_TOTAL(data.length);
                       })
                   this.$emit('close');
                   })
