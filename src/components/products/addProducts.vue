@@ -31,6 +31,11 @@
                         <q-select outlined v-model="productToSubmit.model" option-label="name" 
                         :options="gettersModels"  label="Model"  :rules="[val => !!val || 'Field is required']" ref="model"/>
                     </div>
+                    <div class="col-3">    
+         <!--  <q-input outlined v-model="productToSubmit.amountMaterial"  label-color="purple-8" :label=productToSubmit.model.factor --> 
+                          <q-input outlined v-model="productToSubmit.amountMaterial"  label='MEDIDA' 
+                          :rules="[val => !!val || 'Field is required' , val => (val.length > 0 && val.length < 100 ) || 'Please type a number greater than zero', isValidMountMaterial]" ref="amountMaterial"/>
+                        </div>
                     <div class="col-12" v-if="productToSubmit.model.activeFactor">
                       <div class="row">
                         <div class="col-3">
@@ -40,14 +45,15 @@
                           <q-input outlined v-model="productToSubmit.model.cost" :label="'Costo x '+productToSubmit.model.factor" disable  
                           :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="model.cost"/>
                         </div>
-                        <div class="col-3">    
-                          <q-input outlined v-model="productToSubmit.amountMaterial"  label-color="purple-8" :label=productToSubmit.model.factor 
-                          :rules="[val => !!val || 'Field is required' , val => (val.length > 0 && val.length < 100 ) || 'Please type a number greater than zero', isValidMountMaterial]" ref="amountMaterial"/>
-                        </div>
+
                         <div class="col-3">    
                           <q-input outlined v-model.number="calculateCost" disable label="Cost" 
                           :rules="[val => !!val || 'Field is required' , val => (val > 0 && val < 100000) || 'Please type a number greater than zero']" ref="cost"/>
                
+                        </div>
+                        <div class="col-3" v-if="productToSubmit.model.factor=='Peso'">    
+                           <q-input outlined v-model="productToSubmit.peso"  label='Peso' 
+                          :rules="[val => !!val || 'Field is required' , val => (val.length > 0 && val.length < 100 ) || 'Please type a number greater than zero', isValidMountMaterial]" ref="amountMaterial"/>
                         </div>
                       </div>
                     </div>
@@ -107,8 +113,6 @@
             </q-card-actions>
         </div>
     </form>
-
-
  
 </q-card>
  
@@ -162,6 +166,7 @@ export default {
                      percentage:'',
                      price: '',
                      stock: '',
+                     peso: '',
                      stars: '',
                      images: [],
                      active: true,
@@ -186,7 +191,7 @@ export default {
               calculateCost() {
                 if(this.productToSubmit.model.cost){
                     if(this.productToSubmit.model.factor == 'Peso'){
-                    this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.amountMaterial;
+                    this.productToSubmit.cost = this.productToSubmit.model.cost * this.productToSubmit.peso;
                     return this.productToSubmit.cost;
                     }else{
                       let mountMaterial = this.productToSubmit.amountMaterial.split('*');
@@ -333,6 +338,7 @@ export default {
 
           async submitProduct(){
               try { 
+                console.log(this.productToSubmit)
                      var user = await auth.currentUser;
                      this.productToSubmit.author = user.uid; 
                      this.productToSubmit.modelId = this.productToSubmit.model.id;

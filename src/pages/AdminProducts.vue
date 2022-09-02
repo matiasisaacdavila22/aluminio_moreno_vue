@@ -30,7 +30,7 @@
       </q-dialog>
      <q-table
       title="Table Products"
-      :rows="getProducts"
+      :rows="filteredProducts"
       :columns="columns"
       row-key="name"
       binary-state-sort
@@ -79,10 +79,10 @@
               <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
             </q-popup-edit>
             </q-td>
-          <q-td key="size" :props="props">
-            {{ props.row.stars }}
-            <q-popup-edit v-model="props.row.size" title="Update Size" buttons persistent v-slot="scope">
-              <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+          <q-td key="amountMaterial" :props="props">
+            {{ props.row.amountMaterial }}
+            <q-popup-edit v-model="props.row.amountMaterial" title="Update Size" buttons persistent v-slot="scope">
+              <q-input type="text" v-model="scope.value" dense autofocus hint="Use buttons to close" />
             </q-popup-edit>
             </q-td>
           <q-td key="active" :props="props">
@@ -226,9 +226,15 @@ export default defineComponent({
   },
 
   created() {
-    this.getModels();
-    this.listCategories();
-    this.listProducts();
+    this.listCategories()
+      .then(res => {
+        this.getModels().
+          then(res => {
+            this.listProducts();
+          })
+      })
+
+ 
    },
 
 
@@ -237,7 +243,7 @@ export default defineComponent({
     ...mapState("categories/categories", ["categories",'columnsCategories']),
     ...mapGetters("categories/categories", ["getCategories"]),
    // ...mapState('sales/sales', ['sales','columnsSales']),
-    ...mapGetters("products/products", ["getProducts"]),
+    ...mapGetters("products/products", ["getProducts", "getSearchProducts", 'filteredProducts']),
     ...mapGetters("dashboard/dashboard", ["getCardList"]),
     ...mapGetters('models/models', ['gettersModels'])
   },
@@ -288,24 +294,26 @@ export default defineComponent({
           const resDb = await db.collection("products").where("author", "==", user.uid).get();
           this.SET_PRODUCTS_TOTAL(resDb.size);
           resDb.forEach((element) => {
-           
-            let categoryName = this.getCategories.filter(val => val.id == element.data().categoryId); 
-            let model = this.gettersModels.filter( val => val.id == element.data().modelId);
-            
-            const product = {
-              id: element.id,
-              name: element.data().name,
-              description: element.data().description,
-              stock: element.data().stock,
-              cost: element.data().cost,
-              price: element.data().price,
-              stars: element.data().stars,
-              active: element.data().active,
-              model: model[0].name,
-              category: categoryName[0].name,
-              images: element.data().images,
-            };
-            this.productsAux.push(product);
+            let model = this.seachNameModelById(element.data().modelId);
+            let categoryName = this.seachNameCategoryById(element.data().categoryId);
+  
+                console.log('respuesta: ',categoryName, '  ', model)
+                const product = {
+                    id: element.id,
+                    name: element.data().name,
+                    description: element.data().description,
+                    stock: element.data().stock,
+                    cost: element.data().cost,
+                    price: element.data().price,
+                    stars: element.data().stars,
+                    active: element.data().active,
+                    model: model,
+                    category: categoryName,
+                    amountMaterial: element.data().amountMaterial,
+                    images: element.data().images,
+                  };
+                  this.productsAux.push(product);
+                   
           });
           this.setProducts(this.productsAux);
         console.log(this.productsAux)
@@ -314,6 +322,24 @@ export default defineComponent({
         console.log(error);
       }
     },
+
+     seachNameCategoryById(idCategory){
+        for(let i = 0; this.getCategories.length > i; i++){
+            if(this.getCategories[i].id == idCategory){
+                     return this.getCategories[i].name;
+                   }
+               }; 
+            return null;
+       },
+
+    seachNameModelById(idModel){
+        for(let i = 0; this.gettersModels.length > i; i++){
+            if(this.gettersModels[i].id == idModel){
+                 return this.gettersModels[i].name;
+                   }
+               }; 
+            return null;
+       },
 
     async getModels(){
       try {

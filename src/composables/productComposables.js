@@ -31,6 +31,8 @@ const productComposable = () => {
                 stars: element.data().stars,
                 active: element.data().active,
                 model: model[0].name,
+                amountMaterial: element.data().amountMaterial,
+                peso: element.data().peso,
                 images: element.data().images,
                }
                products.push(product);  

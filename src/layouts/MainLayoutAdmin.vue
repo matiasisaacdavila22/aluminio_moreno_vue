@@ -17,9 +17,8 @@
 
         <q-space />
 
-        <div class="GPLAY__toolbar-input-container row no-wrap">
-          <q-input dense outlined square placeholder="Search" class="bg-white col" />
-          <q-btn class="GPLAY__toolbar-input-btn" color="primary" icon="search" unelevated />
+        <div style="top: 0; width: 70%;" >
+          <ProductSearch />
         </div>
 
         <div>
@@ -82,7 +81,7 @@ import EssentialLink from 'components/EssentialLink.vue'
 import { defineComponent, ref } from 'vue'
 import { auth, db } from "boot/firebase";
 import { useAuth } from '@vueuse/firebase/useAuth'
-
+import ProductSearch from 'src/components/products/ProductSearch.vue';
 
 
 const linksList = [
@@ -123,7 +122,8 @@ export default defineComponent({
   name: 'MainLayoutAdmin',
 
   components: {
-    EssentialLink
+    EssentialLink,
+    ProductSearch
   },
 
   setup () {
