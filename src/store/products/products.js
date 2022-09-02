@@ -15,7 +15,7 @@ export default {
                 { name: 'cost', label: 'Costo', field: 'cost', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
                 { name: 'price', label: 'Precio ($)', field: 'price', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
                 { name: 'stock', label: 'Stock', field: 'stock', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-                { name: 'stars', label: 'Stars', field: 'stars', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
+                { name: 'size', label: 'SIZE', field: 'size', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
                 { name: 'active', label: 'Active', field: 'active'},
                 { name: 'actions', label: 'Actions', field: 'actions'}
               ],

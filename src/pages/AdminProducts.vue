@@ -79,9 +79,9 @@
               <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
             </q-popup-edit>
             </q-td>
-          <q-td key="stars" :props="props">
+          <q-td key="size" :props="props">
             {{ props.row.stars }}
-            <q-popup-edit v-model="props.row.stars" title="Update Stars" buttons persistent v-slot="scope">
+            <q-popup-edit v-model="props.row.size" title="Update Size" buttons persistent v-slot="scope">
               <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
             </q-popup-edit>
             </q-td>
@@ -283,19 +283,18 @@ export default defineComponent({
     async listProducts() {
       try {
         if (true) {
-          console.log(this.getProducts);
           var user = await auth.currentUser;
           console.log(user.uid);
           const resDb = await db.collection("products").where("author", "==", user.uid).get();
           this.SET_PRODUCTS_TOTAL(resDb.size);
-          console.log(resDb);
           resDb.forEach((element) => {
-            let category = this.getCategories.filter(val => val.id == element.data().categoryId);
+           
+            let categoryName = this.getCategories.filter(val => val.id == element.data().categoryId); 
             let model = this.gettersModels.filter( val => val.id == element.data().modelId);
+            
             const product = {
               id: element.id,
               name: element.data().name,
-              category: category[0].name,
               description: element.data().description,
               stock: element.data().stock,
               cost: element.data().cost,
@@ -303,6 +302,7 @@ export default defineComponent({
               stars: element.data().stars,
               active: element.data().active,
               model: model[0].name,
+              category: categoryName[0].name,
               images: element.data().images,
             };
             this.productsAux.push(product);

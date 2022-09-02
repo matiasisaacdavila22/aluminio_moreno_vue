@@ -285,15 +285,15 @@ export default {
           },
 
             isValidMountMaterial(val){
-           if(this.productToSubmit.model.factor == 'Metro'){
-                const mountMateriaPattern = /[0-9]+\*[0-9]/;
-                return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
-           }
-            if(this.productToSubmit.model.factor == 'Peso'){
-                const mountMateriaPattern = /[0-9]/;
-                return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
-            }
-            },
+                if(this.productToSubmit.model.factor == 'Metro'){
+                      const mountMateriaPattern = /[0-9]+\*[0-9]/;
+                      return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
+                }
+                  if(this.productToSubmit.model.factor == 'Peso'){
+                      const mountMateriaPattern = /[0-9]/;
+                      return mountMateriaPattern.test(val) || 'EL fromato de ingreso no es Correcto!'
+                  }
+              },
 
 
             submitForm() {
